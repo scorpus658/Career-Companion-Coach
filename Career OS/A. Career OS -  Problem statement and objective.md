@@ -9,7 +9,7 @@
 	4. They also find this difficult to do when they are at the work place (inhibitions) and leaves bulk of the effort to be largely forced into evenings / hide time.
 
 3. We have some strong first principle led hypothesis :
-	1.  Candidate real preference are not equal to their stated preferences. There is need to unearth those real preferences.
+	1. Candidate real preference are not equal to their stated preferences. There is need to unearth those real preferences.
 	2. There is also a set of jobs that exist which are suitable for my current skill sets / pedigree.
 	3. If i am able to match jobs from the real preferences set to the set of actual viable jobs(detailed in 2) then i have created a delight for the user and also solved a genuine problem
 	4. In the process of unearthing i have created delight because the user feels “heard” in the context of knowing the user(evidenced by 10+ mins of calls done with Jack by multiple users)
@@ -18,8 +18,8 @@
 	
 	1. Reason to believe that we have discovered “real”/ “unstated” preferences
 	2. Reason to believe that we have matched “eligible” jobs with their revealed preferences
-	    1. Reason to beliver that we have found jobs that fit their actual capabilities (input to 2) 
-	3. Reason to belive that we have assisted in improving their cv (Linkedin) i.e., incorporating actual abilities, real preferences and custom fit to the JD
+	    1. Reason to believe that we have found jobs that fit their actual capabilities (input to 2) 
+	3. Reason to believe that we have assisted in improving their cv (LinkedIn) i.e., incorporating actual abilities, real preferences and custom fit to the JD
 	4. Reason to believe that we have assisted their application journey e.g., finding a referee , helping draft their message
 	5. Reason to believe we have actually enabled them to get the job (coach them)
 	6. Reason to believe they have found the job
