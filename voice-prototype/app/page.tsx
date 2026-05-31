@@ -34,6 +34,9 @@ export default function Home() {
   const [resolving, setResolving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [seeding, setSeeding] = useState(false);
+  // Testing aid: force the first-time-call experience even when a prior call exists,
+  // so you can re-test the "new user" greeting without wiping stored history.
+  const [forceNew, setForceNew] = useState(false);
 
   const callIdRef = useRef<string | null>(null);
   const linesRef = useRef<Line[]>([]);
@@ -155,8 +158,10 @@ export default function Home() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Call start failed");
       callIdRef.current = data.callId;
+      // forceNew overrides the stored returning-status for testing.
+      const isReturning = forceNew ? false : data.isReturning;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      vapiRef.current?.start(buildInterviewAssistant(data.priorContext) as any);
+      vapiRef.current?.start(buildInterviewAssistant(data.priorContext, isReturning) as any);
     } catch (e) {
       setStatus("idle");
       setError(e instanceof Error ? e.message : "Call start failed");
@@ -295,6 +300,16 @@ export default function Home() {
             <span style={S.status}>status: {status}</span>
           </div>
 
+          <label style={S.checkboxRow}>
+            <input
+              type="checkbox"
+              checked={forceNew}
+              onChange={(e) => setForceNew(e.target.checked)}
+            />
+            Treat as first-time call (testing) — greet as a brand-new user, ignoring any
+            prior call history
+          </label>
+
           <button style={S.secondary} onClick={extractSample} disabled={extracting}>
             {extracting ? "Extracting…" : "Test extraction (sample transcript)"}
           </button>
@@ -348,6 +363,7 @@ const S: Record<string, CSSProperties> = {
   secondary: { background: "#fff", color: "#111", border: "1px solid #ccc", borderRadius: 8, padding: "10px 16px", fontSize: 14, cursor: "pointer", marginBottom: 16 },
   danger: { background: "#c0392b", color: "#fff", border: "none", borderRadius: 8, padding: "10px 16px", fontSize: 14, cursor: "pointer" },
   status: { color: "#888", fontSize: 13 },
+  checkboxRow: { display: "flex", alignItems: "flex-start", gap: 8, fontSize: 12, color: "#777", marginBottom: 16, cursor: "pointer", maxWidth: 480 },
   input: { flex: 1, border: "1px solid #ccc", borderRadius: 8, padding: 10, fontSize: 13, fontFamily: "system-ui, sans-serif" },
   transcript: { border: "1px solid #eee", borderRadius: 8, padding: 12, minHeight: 160, maxHeight: 360, overflowY: "auto", background: "#fafafa", marginBottom: 12 },
   asstLine: { margin: "6px 0", color: "#222" },

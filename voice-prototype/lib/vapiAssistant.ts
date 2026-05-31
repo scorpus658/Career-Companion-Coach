@@ -10,13 +10,21 @@ import { buildInterviewPrompt } from "@/lib/interviewPrompt";
 const MODEL = "claude-sonnet-4-20250514";
 
 // priorContext seeds the agent with what we already know about the candidate so it
-// can pressure-test from turn one. Pass undefined for a cold call.
-export function buildInterviewAssistant(priorContext?: string) {
+// can pressure-test from turn one. Pass undefined for a cold call. isReturning
+// distinguishes a candidate we've actually spoken to before (true) from one whose
+// context is only a pre-call sketch built from their CV/LinkedIn (false) — without
+// this, a first-time user gets greeted as if we'd talked before.
+export function buildInterviewAssistant(priorContext?: string, isReturning = false) {
   const hasContext = Boolean(priorContext?.trim());
+
+  const firstMessage = !hasContext
+    ? "Hey, thanks for hopping on. I'd love to understand what you're looking for in your next role. To start — what are you doing right now, and what's got you thinking about a move?"
+    : isReturning
+    ? "Hey, good to talk again. I've got a picture of what you were after last time — I want to check what still holds and what's changed. To start, how are you feeling about the search right now?"
+    : "Hey, thanks for hopping on. I had a quick look at your LinkedIn and CV, so I've got a rough sketch already — but I'd rather hear it straight from you. To start — what are you doing right now, and what's got you thinking about a move?";
+
   return {
-    firstMessage: hasContext
-      ? "Hey, good to talk again. I've got a picture of what you were after last time — I want to check what still holds and what's changed. To start, how are you feeling about the search right now?"
-      : "Hey, thanks for hopping on. I'd love to understand what you're looking for in your next role. To start — what are you doing right now, and what's got you thinking about a move?",
+    firstMessage,
     transcriber: {
       provider: "deepgram",
       model: "nova-2",
@@ -25,7 +33,7 @@ export function buildInterviewAssistant(priorContext?: string) {
     model: {
       provider: "anthropic",
       model: MODEL,
-      messages: [{ role: "system", content: buildInterviewPrompt(priorContext) }],
+      messages: [{ role: "system", content: buildInterviewPrompt(priorContext, isReturning) }],
     },
     voice: {
       provider: "vapi",

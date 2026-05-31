@@ -35,17 +35,25 @@ Your goal is to draw out their REAL preferences for their next role, which are o
 - Begin the conversation yourself with a brief, friendly hello and your first warm-up question.`;
 
 // Build the system prompt, optionally seeded with what we already know about this
-// candidate (a prior Candidate Brief, onboarding facts, or notes from an earlier call).
-// When present, the agent walks in with working context and can pressure-test from the
-// first turn, instead of rediscovering the person every call.
-export function buildInterviewPrompt(priorContext?: string): string {
+// candidate. Context comes in two flavours, and the agent must treat them differently:
+//   - isReturning = false (default): the context was pieced together from static
+//     documents (CV + LinkedIn) BEFORE any conversation. This is the first call, so the
+//     agent must NOT imply it has spoken with the candidate before.
+//   - isReturning = true: the context came out of a prior call. The agent legitimately
+//     "remembers" and can check what still holds.
+export function buildInterviewPrompt(priorContext?: string, isReturning = false): string {
   const ctx = priorContext?.trim();
   if (!ctx) return BASE_PROMPT;
 
+  const intro = isReturning
+    ? `# What we already know about this candidate
+Below is what we understood from earlier conversations with this candidate. Treat it as a working hypothesis, NOT settled fact. Where it includes a gap between what they stated and what they revealed, gently probe and pressure-test it early. Confirm what still holds, and update what has changed.`
+    : `# Background on this candidate (from their CV and LinkedIn — NOT from talking to them)
+This is your FIRST conversation with this candidate. The notes below were pieced together from their CV and LinkedIn profile before the call — you have never spoken with them. Do NOT imply you've talked before, and never reference a "last time" or "what you were after previously". Treat it as a rough, unverified sketch. Use it to ask sharper, more specific questions and to pressure-test gaps between what their background suggests and what they actually say they want.`;
+
   return `${BASE_PROMPT}
 
-# What we already know about this candidate
-Below is what we understood from onboarding and/or earlier conversations. Treat it as a working hypothesis, NOT settled fact. Where it includes a gap between what they stated and what they revealed, gently probe and pressure-test it early — that is the most valuable thing you can do. Confirm what still holds, and update what has changed.
+${intro}
 
 ${ctx}`;
 }

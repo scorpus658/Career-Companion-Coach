@@ -27,11 +27,14 @@ export async function POST(req: NextRequest) {
   const priorContext = latestBrief
     ? formatBriefForPrompt(latestBrief.brief as CandidateBrief)
     : "";
+  // A "call_out" brief came from a previous conversation, so this is a returning
+  // candidate. A "seed" brief was built from CV/LinkedIn only — still their first call.
+  const isReturning = latestBrief?.source === "call_out";
 
   const inserted = await db
     .insert(schema.calls)
     .values({ profileId, briefInId })
     .returning();
 
-  return NextResponse.json({ callId: inserted[0].id, priorContext });
+  return NextResponse.json({ callId: inserted[0].id, priorContext, isReturning });
 }
