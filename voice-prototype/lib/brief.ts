@@ -1,5 +1,13 @@
 // Candidate Brief — the living record the whole product anchors on.
 // In this prototype it is produced post-call by /api/extract from the transcript.
+//
+// Three-layer preference model:
+//   statedValue        — what they explicitly claimed they want (the headline)
+//   revealedValue      — what energy/corrections/choices imply they actually want
+//   operativeConstraint — the hard floor / deal-breaker: what makes a placement
+//                         fall through. Usually surfaces as a subordinate clause
+//                         ("because...", "unless...", "as long as...") rather than
+//                         a direct answer. Null if no hard constraint detected.
 
 export type PreferenceSource = "stated" | "revealed" | "inferred";
 
@@ -7,6 +15,7 @@ export interface PreferenceDimension {
   dimension: string;
   statedValue: string | null;
   revealedValue: string | null;
+  operativeConstraint: string | null; // the non-negotiable hard floor
   confidence: number; // 0..1
   source: PreferenceSource;
   evidence: string | null; // the moment in the call that supports this
@@ -56,12 +65,17 @@ export const BRIEF_TOOL_SCHEMA = {
           dimension: { type: "string" },
           statedValue: {
             type: ["string", "null"],
-            description: "What they explicitly said they want. Null if never stated.",
+            description: "What they explicitly said they want (the headline answer). Null if never stated.",
           },
           revealedValue: {
             type: ["string", "null"],
             description:
-              "What their reactions/choices imply they actually want, if it differs from or sharpens the stated value. Null if no signal.",
+              "What their reactions, hesitations, self-corrections, energy, and tradeoff choices imply they ACTUALLY want — especially when it differs from the stated value. Watch for: the second number after an anchor ('but I'd go as low as...'), self-corrections mid-sentence, the word 'actually' or 'honestly', topics they lit up vs. went flat on. Null if no signal.",
+          },
+          operativeConstraint: {
+            type: ["string", "null"],
+            description:
+              "The hard floor / deal-breaker for this dimension — what would make them walk away from an otherwise good offer. This is NOT the stated preference; it is the non-negotiable minimum. It almost always surfaces as a subordinate clause rather than a direct answer: 'because...', 'unless...', 'as long as...', 'I know I'm eventually going to...', 'the reason I need...' — parse those qualifiers, not just the headline. Examples: comp floor they'd accept if role is right; visa requirement; a specific work-hours ceiling. Null if no hard constraint detected.",
           },
           confidence: {
             type: "number",
@@ -70,10 +84,10 @@ export const BRIEF_TOOL_SCHEMA = {
           source: { type: "string", enum: ["stated", "revealed", "inferred"] },
           evidence: {
             type: ["string", "null"],
-            description: "The moment in the conversation that supports this.",
+            description: "The specific moment in the conversation — preferably a direct quote or close paraphrase — that supports this. Prioritise subordinate clauses and self-corrections over direct answers, as they carry the most signal.",
           },
         },
-        required: ["dimension", "statedValue", "revealedValue", "confidence", "source", "evidence"],
+        required: ["dimension", "statedValue", "revealedValue", "operativeConstraint", "confidence", "source", "evidence"],
       },
     },
     underlyingValues: {

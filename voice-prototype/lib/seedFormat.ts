@@ -11,14 +11,16 @@ export function formatBriefForPrompt(brief: CandidateBrief): string {
   }
 
   if (brief.dimensions?.length) {
-    lines.push("Preferences (stated vs revealed):");
+    lines.push("Preferences (stated → revealed → hard floor):");
     for (const d of brief.dimensions) {
       const stated = d.statedValue ?? "—";
       const revealed = d.revealedValue ?? "—";
+      const floor = d.operativeConstraint ?? null;
       const conf = (d.confidence * 100).toFixed(0);
       lines.push(
         `- ${d.dimension} — stated: ${stated} | revealed: ${revealed} | confidence: ${conf}% (${d.source})`
       );
+      if (floor) lines.push(`  ⚠ hard floor: ${floor}`);
       if (d.evidence) lines.push(`  evidence: ${d.evidence}`);
     }
     lines.push("");

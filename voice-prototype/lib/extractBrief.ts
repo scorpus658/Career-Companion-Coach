@@ -5,16 +5,27 @@ const MODEL = "claude-sonnet-4-6";
 
 const EXTRACTION_GUIDANCE = `You are analyzing a transcript of a voice career interview between an AI companion and a job seeker.
 
-Produce a Candidate Brief by calling the save_candidate_brief tool. Be rigorous about the distinction that matters most:
-- statedValue = what the candidate explicitly claimed they want.
-- revealedValue = what their reactions, hesitations, energy, and tradeoff choices imply they ACTUALLY want, when it differs from or sharpens what they stated.
+Produce a Candidate Brief by calling the save_candidate_brief tool. The brief uses a THREE-LAYER model for each preference dimension:
 
-Pay special attention to:
-- Laddering moments (the "why behind the why") -> underlyingValues.
-- Forced-tradeoff answers -> tradeoffs, and what priority order they reveal.
-- Any gap between stated and revealed -> contradictions (these are the highest-value findings).
+LAYER 1 — statedValue: the headline answer. What they explicitly claimed they want.
 
-Only assert a revealedValue when the transcript supports it. Cite the supporting moment in evidence. Do not invent preferences the candidate never gave signal on.`;
+LAYER 2 — revealedValue: what their energy, self-corrections, hesitations, and choices imply they ACTUALLY want, when it differs from the stated value. Signals to watch for:
+  - The word "actually" or "honestly" mid-sentence (self-correction)
+  - Topics where they spoke at length vs. gave one-word answers (energy gap)
+  - Self-contradictions within the same answer (e.g., "individual impact is fine... I'd love to be in a managerial role")
+  - The second number offered after an anchor ("my target is X, but I'd go as low as Y")
+
+LAYER 3 — operativeConstraint: the hard floor / deal-breaker. What would make them walk away from an otherwise good offer. This is the layer that makes placements FALL THROUGH if missed. It almost never surfaces as a direct answer — listen for:
+  - Subordinate justifications: "because...", "the reason I need...", "since I'm eventually going to..."
+  - Unprompted qualifiers attached to other answers (the most important clause in a sentence is often not the main clause)
+  - Facts they answered fluently while stalling on adjacent self-characterization questions (fluency on facts = real constraints)
+
+Additional signals:
+- Laddering moments (the "why behind the why") -> underlyingValues
+- Forced-tradeoff answers -> tradeoffs, and what priority order they reveal
+- Gaps between stated and revealed -> contradictions (highest-value findings)
+
+Only assert a revealedValue or operativeConstraint when the transcript supports it. Cite the moment in evidence — preferably a direct quote or close paraphrase. Do not invent preferences the candidate never gave signal on.`;
 
 const EVOLUTION_GUIDANCE = `You are also given the Brief that seeded this call (the candidate's working profile coming in). Treat it as hypothesis, not settled fact. Your job in this call is to evolve it:
 - Confirm dimensions the conversation reinforced (raise confidence).

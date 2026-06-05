@@ -31,6 +31,12 @@ export function BriefView({ brief }: { brief: CandidateBrief }) {
                 <span style={s.tagRevealed}>revealed</span>
                 <span>{d.revealedValue ?? "—"}</span>
               </div>
+              {d.operativeConstraint && (
+                <div style={s.row}>
+                  <span style={s.tagFloor}>floor</span>
+                  <span style={s.floorText}>{d.operativeConstraint}</span>
+                </div>
+              )}
               <div style={s.meta}>
                 conf {Math.round(d.confidence * 100)}% · {d.source}
                 {d.evidence ? ` · ${d.evidence}` : ""}
@@ -97,6 +103,8 @@ const s: Record<string, CSSProperties> = {
   row: { display: "flex", gap: 8, alignItems: "baseline", fontSize: 14, margin: "2px 0" },
   tagStated: { fontSize: 11, background: "#eef", color: "#446", borderRadius: 4, padding: "1px 6px", minWidth: 56, textAlign: "center" },
   tagRevealed: { fontSize: 11, background: "#efe", color: "#264", borderRadius: 4, padding: "1px 6px", minWidth: 56, textAlign: "center" },
+  tagFloor: { fontSize: 11, background: "#fff0e6", color: "#92400e", borderRadius: 4, padding: "1px 6px", minWidth: 56, textAlign: "center", fontWeight: 600 },
+  floorText: { color: "#92400e", fontWeight: 500 },
   meta: { fontSize: 12, color: "#999", marginTop: 4 },
   tradeoff: { border: "1px solid #eee", borderRadius: 8, padding: 10, marginBottom: 8, fontSize: 14, lineHeight: 1.5 },
   reveals: { color: "#264e8a", marginTop: 2 },
